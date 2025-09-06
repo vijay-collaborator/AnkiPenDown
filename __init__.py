@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright: Michal Krassowski <krassowski.michal@gmail.com>
 # Copyright: Rytis Petronis <petronisrytis@gmail.com>
+# Copyright: Vijay 
 # License: GNU GPL, version 3 or later; http://www.gnu.org/copyleft/gpl.html
 """
 Initially based on the Anki-TouchScreen addon, updated ui and added pressure pen/stylus capabilities.
