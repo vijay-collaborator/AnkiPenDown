@@ -1,6 +1,8 @@
 # AnkiPenDown
 ### Your complete digital ink toolkit for Anki. Draw, write, highlight, and erase directly on your cards with full customization and control.
 
+![AnkiPenDown](https://github.com/user-attachments/assets/3a2e845a-3f64-47f3-9a28-98c17e17a399)
+
 ![AnkiPenDown in action](https://github.com/user-attachments/assets/10f43df1-86e8-49f5-a974-e37f9e30dde5)
 
 ---
