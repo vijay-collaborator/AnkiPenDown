@@ -37,6 +37,7 @@ ts_auto_hide_pointer = True
 ts_default_small_canvas = False
 ts_zen_mode = False
 ts_follow = False
+ts_compact_toolbar = False
 ts_pen1_color = "#000000" # Default for Pen 1
 ts_pen2_color = "#ff0000" # Default for Pen 2
 ts_line_width = 4
@@ -276,6 +277,7 @@ def ts_save():
     mw.pm.profile['ts_default_small_canvas'] = ts_default_small_canvas
     mw.pm.profile['ts_zen_mode'] = ts_zen_mode
     mw.pm.profile['ts_follow'] = ts_follow
+    mw.pm.profile['ts_compact_toolbar'] = ts_compact_toolbar
     mw.pm.profile['ts_location'] = ts_location
     mw.pm.profile['ts_x_offset'] = ts_x_offset
     mw.pm.profile['ts_y_offset'] = ts_y_offset
@@ -289,7 +291,7 @@ def ts_load():
     Load configuration from profile, set states of checkable menu objects
     and turn on night mode if it were enabled on previous session.
     """
-    global ts_state_on, ts_pen1_color, ts_pen2_color, ts_profile_loaded, ts_line_width, ts_auto_hide, ts_auto_hide_pointer, ts_default_small_canvas, ts_zen_mode, ts_follow, ts_orient_vertical, ts_y_offset, ts_x_offset, ts_location, ts_small_width, ts_small_height, ts_background_color
+    global ts_state_on, ts_pen1_color, ts_pen2_color, ts_profile_loaded, ts_line_width, ts_auto_hide, ts_auto_hide_pointer, ts_default_small_canvas, ts_zen_mode, ts_follow, ts_compact_toolbar, ts_orient_vertical, ts_y_offset, ts_x_offset, ts_location, ts_small_width, ts_small_height, ts_background_color
     try:
         ts_state_on = mw.pm.profile['ts_state_on']
         ts_pen1_color = mw.pm.profile['ts_pen1_color']
@@ -300,6 +302,7 @@ def ts_load():
         ts_default_small_canvas = mw.pm.profile['ts_default_small_canvas']
         ts_zen_mode = mw.pm.profile['ts_zen_mode']
         ts_follow = mw.pm.profile['ts_follow']
+        ts_compact_toolbar = mw.pm.profile['ts_compact_toolbar']
         ts_orient_vertical = mw.pm.profile['ts_orient_vertical']
         ts_y_offset = mw.pm.profile['ts_y_offset']
         ts_small_width = mw.pm.profile['ts_small_width']
@@ -317,6 +320,7 @@ def ts_load():
         ts_default_small_canvas = False
         ts_zen_mode = False
         ts_follow = False
+        ts_compact_toolbar = False
         ts_orient_vertical = True
         ts_y_offset = 2
         ts_small_width = 500
@@ -330,6 +334,7 @@ def ts_load():
     ts_menu_small_default.setChecked(ts_default_small_canvas)
     ts_menu_zen_mode.setChecked(ts_zen_mode)
     ts_menu_follow.setChecked(ts_follow)
+    ts_menu_compact_toolbar.setChecked(ts_compact_toolbar)
     if ts_state_on:
         ts_on()
     assure_plugged_in()
@@ -365,11 +370,12 @@ def ts_onload():
     ts_setup_menu()
 
 def blackboard():
-    part1 = u"""
+    toolbar_class = "compact" if ts_compact_toolbar else ""
+    part1 = f"""
 <div id="canvas_wrapper">
     <canvas id="highlighter_canvas" width="100" height="100"></canvas>
     <canvas id="pen_canvas" width="100" height="100"></canvas>
-    <div id="pencil_button_bar">
+    <div id="pencil_button_bar" class="{toolbar_class}">
         <button id="ts_visibility_button" class="active" title="Toggle visiblity (, comma)"
               onclick="switch_visibility();" >
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -491,6 +497,12 @@ body {
 } #pencil_button_bar > button:hover > svg {
   filter: drop-shadow(0 0 4px #000);
 }
+#pencil_button_bar.compact > button {
+  margin: 1px;
+}
+#pencil_button_bar.compact > button > svg {
+  width: 1.5em;
+}
 #pencil_button_bar > button.active:not(.color-button) > svg {
   stroke: #000;
 }
@@ -559,12 +571,16 @@ function set_pen_color(new_color, clicked_button) {
 function set_highlighter_tool(clicked_button) {
     current_tool = 'highlighter';
     manage_active_button(clicked_button);
-    wrapper.style.cursor = "url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDM3NSAzNzQuOTk5OTkxIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCIgdmVyc2lvbj0iMS4wIj48ZGVmcz48Y2xpcFBhdGggaWQ9ImQ0ODdmYmZmZTIiPjxwYXRoIGQ9Ik0gMSAzMDIuMDY2NDA2IEwgMzM3IDMwMi4wNjY0MDYgTCAzMzcgMzU1IEwgMSAzNTUgWiBNIDEgMzAyLjA2NjQwNiAiIGNsaXAtcnVsZT0ibm9uemVybyIvPjwvY2xpcFBhdGg+PGNsaXBQYXRoIGlkPSI1Mjk3MjU3ZTljIj48cGF0aCBkPSJNIDI0LjcxODc1IDI4MSBMIDkxLjgwNDY4OCAyODEgTCA5MS44MDQ2ODggMzM3LjI5Mjk2OSBMIDI0LjcxODc1IDMzNy4yOTI5NjkgWiBNIDI0LjcxODc1IDI4MSAiIGNsaXAtcnVsZT0ibm9uemVybyIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNkNDg3ZmJmZmUyKSI+PHBhdGggZmlsbD0iI2ZmZTc0NiIgZD0iTSA3NS41NDI5NjkgMzA3LjAwMzkwNiBDIDEwMy40ODgyODEgMzA1LjIzNDM3NSAxMzEuMTkxNDA2IDMwNS4xNjAxNTYgMTU5LjI5Njg3NSAzMDQuODM5ODQ0IEMgMTg4LjM2NzE4OCAzMDQuNTA3ODEyIDIxNy41MjM0MzggMzAzLjU1MDc4MSAyNDYuNTk3NjU2IDMwMi45ODA0NjkgQyAyNjYuODQ3NjU2IDMwMi41ODIwMzEgMjg3LjAzOTA2MiAzMDIuMDIzNDM4IDMwNy4yNDIxODggMzAzLjI1NzgxMiBDIDMxMy43MTQ4NDQgMzAzLjY1MjM0NCAzMjAuMTk1MzEyIDMwMy45NjQ4NDQgMzI2LjY3MTg3NSAzMDQuMzI0MjE5IEMgMzI4LjgxMjUgMzA0LjQ0MTQwNiAzMzAuOTM3NSAzMDQuNTgyMDMxIDMzMy4wNzAzMTIgMzA0LjczODI4MSBDIDMzNC4yNzM0MzggMzA0LjgyNDIxOSAzMzcuMTA5Mzc1IDMwNC40MTAxNTYgMzM2LjY1NjI1IDMwNS4wODIwMzEgQyAzMzMuNzE0ODQ0IDMwOS40NzI2NTYgMzMxLjU5Mzc1IDMxMS4yNTM5MDYgMzIyLjkyNTc4MSAzMTIuNjkxNDA2IEMgMzIwLjU4NTkzOCAzMTMuMDgyMDMxIDMxOC4yMjI2NTYgMzEzLjM3ODkwNiAzMTUuODM1OTM4IDMxMy42NDA2MjUgQyAzMTQuNTcwMzEyIDMxMy43ODEyNSAzMTAuODc1IDMxMy43NTM5MDYgMzEyLjA0Mjk2OSAzMTQuMDc4MTI1IEMgMzE2LjA5Mzc1IDMxNS4yMTA5MzggMzIyLjAxNTYyNSAzMTQuNDQ5MjE5IDMyNi4zNTU0NjkgMzE0LjM0Mzc1IEMgMzI2LjU2MjUgMzE0LjMzNTkzOCAzMzAuNzc3MzQ0IDMxNC4xMzI4MTIgMzMwLjg0Mzc1IDMxNC4zMDQ2ODggQyAzMzEuNTAzOTA2IDMxNi4wMTU2MjUgMzI3LjczODI4MSAzMTkuMjE0ODQ0IDMyNi41MjM0MzggMzIwLjYwOTM3NSBDIDMyNS44MjgxMjUgMzIxLjQwNjI1IDMyOS45NDkyMTkgMzIzIDMzMC4zMDQ2ODggMzIzLjY5NTMxMiBDIDMzMC42MjEwOTQgMzI0LjMwMDc4MSAzMjkuMjk2ODc1IDMyNS4xMzY3MTkgMzI4Ljk4NDM3NSAzMjUuNjc5Njg4IEMgMzI4LjA5NzY1NiAzMjcuMjM4MjgxIDMzMC41NTA3ODEgMzI4LjIzMDQ2OSAzMjguNTQyOTY5IDMyOS43MzA0NjkgQyAzMjYuODM5ODQ0IDMzMS4wMDM5MDYgMzE2LjE0NDUzMSAzMzQuMTQ4NDM4IDMxNS45MDIzNDQgMzM0LjUzNTE1NiBDIDMxNC42MDE1NjIgMzM2LjU4OTg0NCAzMjUuODMyMDMxIDMzNi40ODgyODEgMzI2Ljk2ODc1IDMzNi40MDIzNDQgQyAzMjcuMzc4OTA2IDMzNi4zNzEwOTQgMzMxLjczNDM3NSAzMzUuOTQ1MzEyIDMzMS43NDYwOTQgMzM2LjA1MDc4MSBDIDMzMS44NzEwOTQgMzM3LjEzNjcxOSAzMzEuMTAxNTYyIDM0NC4zMzU5MzggMzMwLjY0ODQzOCAzNDUuMDY2NDA2IEMgMzI5Ljk0NTMxMiAzNDYuMTkxNDA2IDMyNi43NzM0MzggMzQ2Ljc4OTA2MiAzMjYuMzcxMDk0IDM0Ny43NTc4MTIgQyAzMjYuMDU0Njg4IDM0OC41MjM0MzggMzI4LjkxNzk2OSAzNDkuNTE1NjI1IDMyOS4wNjY0MDYgMzUwLjI0MjE4OCBDIDMyOS4zMjgxMjUgMzUxLjUwNzgxMiAzMjMuNzkyOTY5IDM1Mi40MTc5NjkgMzIyLjQzNzUgMzUyLjU4MjAzMSBDIDI5NC40MDYyNSAzNTYuMDA3ODEyIDI1Ny4xMDU0NjkgMzUzLjg2NzE4OCAyMjguODk4NDM4IDM1My4zMTY0MDYgQyAxNzcuMzQ3NjU2IDM1Mi4zMDA3ODEgMTI1Ljg3MTA5NCAzNTAuNTQyOTY5IDc0LjMyMDMxMiAzNDkuNzQ2MDk0IEMgNTUuODMyMDMxIDM0OS40NjA5MzggMzYuNDQ1MjgxMiAzNDguMDExNzE5IDE4LjAyNzM0NCAzNDkuMDIzNDM4IEMgMTMuNjkxNDA2IDM0OS4yNjU2MjUgOS4zNTkzNzUgMzQ5LjQyMTg3NSA1LjAwMzkwNiAzNDkuNDY4NzUgQyA0LjY5MTQwNiAzNDkuNDcyNjU2IDEuNDU3MDMxIDM0OS42MTcxODggMS4yODkwNjIgMzQ5LjI1IEMgMC41IDM0Ny41MzkwNjIgNi40NjA5MzggMzQ2LjEzNjcxOSA4LjEwMTU2MiAzNDUuNTU0Njg4IEMgMTMuODA0Njg4IDM0My41MzEyNSAxOC4zNzUgMzQyLjM0Mzc1IDI1LjExNzE4OCAzNDMuMTc5Njg4IEMgMjcuOTcyNjU2IDM0My41MzUxNTYgMzYuMjczNDM4IDM0NS41ODU5MzggMzguOTcyNjU2IDM0NC4wOTM3NSBDIDM4Ljk4ODI4MSAzNDQuMDg1OTM4IDMwLjI3NzM0NCAzNDEuNzg5MDYyIDI5LjUgMzQxLjY3OTY4OCBDIDI0LjcxMDkzOCAzNDEuMDA3ODEyIDE5LjIwNzAzMSAzMzkuOTg4MjgxIDE0LjI4NTE1NiAzNDAuMDM1MTU2IEMgMTIuNzUgMzQwLjA1MDc4MSA4LjEyODkwNiAzNDAuNjYwMTU2IDYuODk0NTMxIDMzOS44ODY3MTkgQyAzLjAyNzM0NCAzMzcuNDYwOTM4IDEyLjkyMTg3NSAzMzUuOTI1NzgxIDE1LjE1NjI1IDMzNS45MTc5NjkgQyAxNi41MDc4MTIgMzM1LjkxNzk2OSAxNy44NjcxODggMzM1Ljk1NzAzMSAxOS4yMTQ4NDQgMzM1Ljk3MjY1NiBDIDE5LjkwNjI1IDMzNS45NzY1NjIgMjEuODQ3NjU2IDMzNi4xNjAxNTYgMjEuMjg5MDYyIDMzNS45MTc5NjkgQyAxNi44MjAzMTIgMzMzLjk3NjU2MiA0Ljk4MDQ2OSAzMzQuNTAzOTA2IDEyLjM3MTA5NCAzMjkuOTAyMzQ0IEMgMTMuNDIxODc1IDMyOS4yNSAxNC44MzU5MzggMzI4Ljc5Njg3NSAxNS44NTU0NjkgMzI4LjE0NDUzMSBDIDE3LjA5NzY1NiAzMjcuMzU1NDY5IDEzLjMwMDc4MSAzMjYuNTc0MjE5IDEyLjM3NSAzMjUuNjQwNjI1IEMgMTEuMDAzOTA2IDMyNC4yNTc4MTIgOC4wODU5MzggMzIwLjUxNTYyNSA4LjMyMDMxMiAzMTguODU5Mzc1IEMgOC41NzgxMjUgMzE3IDEzLjE0ODQzOCAzMTYuODY3MTg4IDEzLjk0OTIxOSAzMTUuNjI4OTA2IEMgMTUuMDg1OTM4IDMxMy44NzEwOTQgOS41NTg1OTQgMzExLjQ1MzEyNSAxMS41NzAzMTIgMzA5LjYzMjgxMiBDIDE0LjgwNDY4OCAzMDYuNzAzMTI1IDIzLjM1NTQ2OSAzMDYuNjQ4NDM4IDI4LjUyMzQzOCAzMDYuMzcxMDk0IEMgNDEuMzcxMDk0IDMwNS42NzU3ODEgNjIuNzU3ODEyIDMwNy43MjI2NTYgNzUuNTQyOTY5IDMwNy4wMDM5MDYgWiBNIDc1LjU0Mjk2OSAzMDcuMDAzOTA2ICIgZmlsbC1vcGFjaXR5PSIxIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L2c+PGcgY2xpcC1wYXRoPSJ1cmwoIzUyOTcyNTdlOWMpIj48cGF0aCBmaWxsPSIjZmJjYjJlIiBkPSJNIDYyLjkyMTg3NSAyODEuMTYwMTU2IEwgMjQuNzE4NzUgMzE5LjM4MjgxMiBMIDYzLjkyMTg3NSAzMzcuMjkyOTY5IEwgOTEuNDg4MjgxIDMwOS43MzgyODEgTCA2Mi45MjE4NzUgMjgxLjE2MDE1NiAiIGZpbGwtb3BhY2l0eT0iMSIgZmlsbC1ydWxlPSJub256ZXJvIi8+PC9nPjxwYXRoIGZpbGw9IiMyMTQwNjAiIGQ9Ik0gNzguNTE1NjI1IDIxMC4yMzA0NjkgQyA3OC41MTU2MjUgMjEwLjIzMDQ2OSA3Ny45NDkyMTkgMjUzLjYwOTM3NSA0OC42Nzk2ODggMjgyLjg4MjgxMiBDIDQ1Ljg1NTQ2OSAyODUuNzEwOTM4IDQ3LjkzNzUgMjg4Ljc1IDQ3LjkzNzUgMjg4Ljc1IEwgODMuOTAyMzQ0IDMyNC43MjI2NTYgQyA4My45MDIzNDQgMzI0LjcyMjY1NiA4Ni45NDE0MDYgMzI2LjgwNDY4OCA4OS43NjU2MjUgMzIzLjk4MDQ2OSBDIDExOS4wMzEyNSAyOTQuNzAzMTI1IDE2Mi40MDIzNDQgMjk0LjEzNjcxOSAxNjIuNDAyMzQ0IDI5NC4xMzY3MTkgTCAxNDMuMDI3MzQ0IDIyOS42MDkzNzUgTCA3OC41MTU2MjUgMjEwLjIzMDQ2OSAiIGZpbGwtb3BhY2l0eT0iMSIgZmlsbC1ydWxlPSJub256ZXJvIi8+PHBhdGggZmlsbD0iI2ZiY2IyZSIgZD0iTSAzNTYuNzUzOTA2IDc1LjMwMDc4MSBMIDM0Ny42OTUzMTIgNjYuMjQyMTg4IEwgMzEwLjEwMTU2MiA2Mi41IEwgMzA2LjM1OTM3NSAyNC44OTQ1MzEgTCAyOTcuMzAwNzgxIDE1LjgzNTkzOCBDIDI5MC43MjI2NTYgOS42MjUgMjgyLjY2Nzk2OSA5LjkxMDE1NiAyNzYuNTk3NjU2IDE0LjY2Nzk2OSBDIDIxMC4xNjc5NjkgNjkuMzM5ODQ0IDcxLjczMDQ2OSAyMDMuNDQ1MzEyIDcxLjczMDQ2OSAyMDMuNDQ1MzEyIEwgMTY5LjE4NzUgMzAwLjkyMTg3NSBDIDE2OS4xODc1IDMwMC45MjE4NzUgMzAzLjI2MTcxOSAxNjIuNDUzMTI1IDM1Ny45MjE4NzUgOTYuMDA3ODEyIEMgMzYyLjY3NTc4MSA4OS45NDE0MDYgMzYyLjk2NDg0NCA4MS44Nzg5MDYgMzU2Ljc1MzkwNiA3NS4zMDA3ODEgIiBmaWxsLW9wYWNpdHk9IjEiIGZpbGwtcnVsZT0ibm9uemVybyIvPjxwYXRoIGZpbGw9IiNmYmUyNzgiIGQ9Ik0gMzA2LjM1OTM3NSAyNC44OTQ1MzEgTCAxNTUuMjc3MzQ0IDE3Ni4wMTE3MTkgQyAxNDkuMjgxMjUgMTgyLjAwNzgxMiAxNDkuMjgxMjUgMTkxLjczNDM3NSAxNTUuMjc3MzQ0IDE5Ny43MjY1NjIgTCAxNzQuOTAyMzQ0IDIxNy4zNTU0NjkgQyAxODAuODk4NDM4IDIyMy4zNTU0NjkgMTkwLjYyMTA5NCAyMjMuMzU1NDY5IDE5Ni42MTMyODEgMjE3LjM1NTQ2OSBMIDM0Ny42OTUzMTIgNjYuMjQyMTg4IEwgMzA2LjM1OTM3NSAyNC44OTQ1MzEgIiBmaWxsLW9wYWNpdHk9IjEiIGZpbGwtcnVsZT0ibm9uemVybyIvPjwvc3ZnPg==') 4 19, crosshair";
+    const svg = document.getElementById('ts_highlighter_button').firstElementChild.outerHTML.replace('width="2em"', 'width="20" height="20"');
+    const encoded = window.btoa(svg);
+    wrapper.style.cursor = `url('data:image/svg+xml;base64,${encoded}') 4 19, crosshair`;
 }
 function set_eraser_tool(clicked_button) {
     current_tool = 'eraser';
     manage_active_button(clicked_button);
-    wrapper.style.cursor = "url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAzNzUgMzc0Ljk5OTk5MSIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48Y2xpcFBhdGggaWQ9IjRjNzVlNWUyMzMiPjxwYXRoIGQ9Ik0gMTYuNzQ2MDk0IDM3LjUgTCAzNTcuOTk2MDk0IDM3LjUgTCAzNTcuOTk2MDk0IDMyNiBMIDE2Ljc0NjA5NCAzMjYgWiBNIDE2Ljc0NjA5NCAzNy41ICIgY2xpcC1ydWxlPSJub256ZXJvIi8+PC9jbGlwUGF0aD48L2RlZnM+PGcgY2xpcC1wYXRoPSJ1cmwoIzRjNzVlNWUyMzMpIj48cGF0aCBmaWxsPSIjYmMzZmRlIiBkPSJNIDI3My41NDY4NzUgMzcuNTY2NDA2IEMgMjY3LjYwNTQ2OSAzNy41ODk4NDQgMjYxLjYxMzI4MSAzOS42MDU0NjkgMjU2LjY3MTg3NSA0My43NTM5MDYgTCA2MC4wMTk1MzEgMjA4Ljc2OTUzMSBDIDQ3Ljc2OTUzMSAyMTkuMDQ2ODc1IDQ1LjAzMTI1IDIzNy4yNDYwOTQgNTMuNTcwMzEyIDI1MC44MDQ2ODggTCA5Ny45Mzc1IDMyMS4yNjU2MjUgQyA5OS4xNzE4NzUgMzI0LjA3MDMxMiAxMDEuOTQ5MjE5IDMyNS44ODY3MTkgMTA1LjAxNTYyNSAzMjUuODgyODEyIEMgMTA1LjA1MDc4MSAzMjUuODg2NzE5IDEwNS4wODIwMzEgMzI1Ljg4NjcxOSAxMDUuMTE3MTg4IDMyNS44ODY3MTkgTCAzNTAuNDI5Njg4IDMyNS44MjAzMTIgQyAzNTMuMjE0ODQ0IDMyNS44NTU0NjkgMzU1LjgwNDY4OCAzMjQuMzkwNjI1IDM1Ny4yMDcwMzEgMzIxLjk4NDM3NSBDIDM1OC42MDkzNzUgMzE5LjU3ODEyNSAzNTguNjA5Mzc1IDMxNi42MDE1NjIgMzU3LjIwNzAzMSAzMTQuMTk1MzEyIEMgMzU1LjgwMDc4MSAzMTEuNzg5MDYyIDM1My4yMTA5MzggMzEwLjMyODEyNSAzNTAuNDI1NzgxIDMxMC4zNjMyODEgTCAxOTQuOTY4NzUgMzEwLjQwNjI1IEwgMzQ2LjgyODEyNSAxODIuOTgwNDY5IEMgMzU5LjA3ODEyNSAxNzIuNjk5MjE5IDM2MS44MjAzMTIgMTU0LjUgMzUzLjI3NzM0NCAxNDAuOTQxNDA2IEwgMjk2LjA1NDY4OCA1MC4wNzAzMTIgQyAyOTUuNTIzNDM4IDQ5LjIzMDQ2OSAyOTQuOTMzNTk0IDQ4LjQ0OTIxOSAyOTQuMzMyMDMxIDQ3LjY3OTY4OCBDIDI5NC4xOTUzMTIgNDcuNDY4NzUgMjk0LjA0Njg3NSA0Ny4yNjE3MTkgMjkzLjg5MDYyNSA0Ny4wNjI1IEMgMjkzLjcyNjU2MiA0Ni44NjcxODggMjkzLjU0Njg3NSA0Ni42OTUzMTIgMjkzLjM3ODkwNiA0Ni41MDM5MDYgTCAyOTMuMzgyODEyIDQ2LjUwMzkwNiBDIDI5My4zNzUgNDYuNSAyOTMuMzcxMDk0IDQ2LjQ5NjA5NCAyOTMuMzY3MTg4IDQ2LjQ5MjE4OCBDIDI4OC4yMzgyODEgNDAuNjEzMjgxIDI4MC45Mzc1IDM3LjUzNTE1NiAyNzMuNTQ2ODc1IDM3LjU2NjQwNiBaIE0gMTYxLjUwMzkwNiAxNDMuNzg1MTU2IEwgMjMzLjU3NDIxOSAyNTcuODM5ODQ0IEwgMTcwLjkxNzk2OSAzMTAuNDE0MDYyIEwgMTE2LjY2MDE1NiAzMTAuNDI5Njg4IEwgMTA5LjM3ODkwNiAzMTAuNDI5Njg4IEwgNjYuNjQ4NDM4IDI0Mi41NzAzMTIgQyA2Mi40NDUzMTIgMjM1Ljg5ODQzOCA2NC4wNTg1OTQgMjI1LjU1NDY4OCA2OS45NTMxMjUgMjIwLjYwNTQ2OSBaIE0gMjQuNjE3MTg4IDI0MS41IEMgMjEuNzUzOTA2IDI0MS40NDkyMTkgMTkuMDkzNzUgMjQyLjk4NDM3NSAxNy43MTA5MzggMjQ1LjQ5NjA5NCBDIDE2LjMyODEyNSAyNDguMDAzOTA2IDE2LjQ0NTMxMiAyNTEuMDc0MjE5IDE4LjAxOTUzMSAyNTMuNDY4NzUgTCAyNS42MzY3MTkgMjY1LjQzNzUgQyAyNy4wOTc2NTYgMjY3LjgxMjUgMjkuNzI2NTYyIDI2OS4yMTg3NSAzMi41MTE3MTkgMjY5LjExMzI4MSBDIDM1LjMwMDc4MSAyNjkuMDA3ODEyIDM3LjgxNjQwNiAyNjcuNDA2MjUgMzkuMDkzNzUgMjY0LjkyNTc4MSBDIDQwLjM2NzE4OCAyNjIuNDQ1MzEyIDQwLjIwNzAzMSAyNTkuNDY4NzUgMzguNjc1NzgxIDI1Ny4xNDA2MjUgTCAzMS4wNTg1OTQgMjQ1LjE2Nzk2OSBDIDI5LjY3NTc4MSAyNDIuOTI5Njg4IDI3LjI1IDI0MS41NDY4NzUgMjQuNjE3MTg4IDI0MS41IFogTSA0NS4wNjY0MDYgMjczLjkyOTY4OCBDIDQyLjE5OTIxOSAyNzMuODY3MTg4IDM5LjUzOTA2MiAyNzUuMzk4NDM4IDM4LjE0NDUzMSAyNzcuOTAyMzQ0IEMgMzYuNzUzOTA2IDI4MC40MDYyNSAzNi44NjMyODEgMjgzLjQ3NjU2MiAzOC40MjU3ODEgMjg1Ljg3NSBMIDUzLjkxNDA2MiAzMTAuMzg2NzE5IEwgMjQuODQzNzUgMzEwLjQzMzU5NCBDIDIyLjA1ODU5NCAzMTAuMzk4NDM4IDE5LjQ3MjY1NiAzMTEuODcxMDk0IDE4LjA3NDIxOSAzMTQuMjc3MzQ0IEMgMTYuNjcxODc1IDMxNi42ODc1IDE2LjY3OTY4OCAzMTkuNjYwMTU2IDE4LjA4NTkzOCAzMjIuMDY2NDA2IEMgMTkuNDkyMTg4IDMyNC40Njg3NSAyMi4wODU5MzggMzI1LjkzMDM0NCAyNC44NzEwOTQgMzI1Ljg4NjcxOSBMIDY2Ljg5NDUzMSAzMjUuODIwMzEyIEMgNjkuNTUwNzgxIDMyNi4xOTUzMTIgNzIuMjEwOTM4IDMyNS4xNjQwNjIgNzMuOTIxODc1IDMyMy4wOTc2NTYgQyA3NS42MzI4MTIgMzIxLjAzNTE1NiA3Ni4xNTIzNDQgMzE4LjIyNjU2MiA3NS4yODkwNjIgMzE1LjY4NzUgQyA3NS4yNzczNDQgMzE1LjY1MjM0NCA3NS4yNjE3MTkgMzE1LjYxMzI4MSA3NS4yNSAzMTUuNTc4MTI1IEMgNzUuMTg3NSAzMTUuNDA0NjIgNzUuMTIxMDk0IDMxNS4yMzA0NjkgNzUuMDQ2ODc1IDMxNS4wNTg1OTQgQyA3NC44MjQyMTkgMzE0LjUzNTE1NiA3NC41NDI5NjkgMzE0LjAzNTE1NiA3NC4yMTA5MzggMzEzLjU3NDIxOSBMIDUxLjQ5MjE4OCAyNzcuNjIxMDk0IEMgNTAuMTE3MTg4IDI3NS4zNzUgNDcuNjk1MzEyIDI3My45ODQzNzUgNDUuMDY2NDA2IDI3My45Mjk2ODggWiBNIDQ1LjA2NjQwNiAyNzMuOTI5Njg4ICIgZmlsbC1vcGFjaXR5PSIxIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L2c+PC9zdmc+') 8 8, crosshair";
+    const svg = document.getElementById('ts_eraser_button').firstElementChild.outerHTML.replace('width="2em"', 'width="20" height="20"');
+    const encoded = window.btoa(svg);
+    wrapper.style.cursor = `url('data:image/svg+xml;base64,${encoded}') 8 8, crosshair`;
 }
 
 // Set initial cursor
@@ -715,15 +731,17 @@ function ts_redraw() {
 }
 function clear_canvas()
 {
-	stop_drawing();
-    strokes_data = [];
+    stop_drawing();
+    if (strokes_data.length > 0 && strokes_data[strokes_data.length - 1].tool === 'clear') {
+        return;
+    }
+    strokes_data.push({ tool: 'clear' });
     redo_stack = [];
-    // Reset the drawing loop's position to fix the unresponsive pen bug
-    nextLine = 0;
+    nextLine = strokes_data.length;
     nextPoint = 0;
     ts_redo_button.className = "";
-    ts_undo_button.className = "";
-	ts_redraw();
+    ts_undo_button.className = "active";
+    ts_redraw();
 }
 function stop_drawing() {
 	isPointerDown = false;
@@ -753,16 +771,30 @@ async function draw_path_at_some_point_async(active_ctx, startX, startY, midX, m
 var pleaseRedrawEverything = false;
 async function draw_upto_latest_point_async(startLine, startPoint){
 	var fullRedraw = false;
+    var effectiveStartLine = startLine;
+
 	if (pleaseRedrawEverything) {
 	    fullRedraw = true;
-	    startLine = 0;
+	    effectiveStartLine = 0;
 	    startPoint = 0;
 	    pen_ctx.clearRect(0, 0, pen_ctx.canvas.width, pen_ctx.canvas.height);
         highlighter_ctx.clearRect(0, 0, highlighter_ctx.canvas.width, highlighter_ctx.canvas.height);
+        
+        let last_clear_index = -1;
+        for (let i = strokes_data.length - 1; i >= 0; i--) {
+            if (strokes_data[i].tool === 'clear') {
+                last_clear_index = i;
+                break;
+            }
+        }
+        if (last_clear_index > -1) {
+            effectiveStartLine = last_clear_index + 1;
+        }
 	}
-	for(var i = startLine; i < strokes_data.length; i++){
+	for(var i = effectiveStartLine; i < strokes_data.length; i++){
         var stroke = strokes_data[i];
 
+        if (stroke.tool === 'clear') continue;
         if (stroke.visible === false) { continue; }
 
         var current_points = stroke.points;
@@ -1039,6 +1071,16 @@ def ts_change_zen_mode_settings():
     ts_switch()
 
 @slot()
+def ts_change_compact_toolbar_settings():
+    """
+    Switch compact toolbar setting.
+    """
+    global ts_compact_toolbar
+    ts_compact_toolbar = not ts_compact_toolbar
+    ts_switch()
+    ts_switch()
+
+@slot()
 def ts_change_auto_hide_pointer_settings():
     """
     Switch auto hide pointer setting.
@@ -1069,7 +1111,7 @@ def ts_setup_menu():
     """
     Initialize menu.
     """
-    global ts_menu_switch, ts_menu_auto_hide, ts_menu_auto_hide_pointer, ts_menu_small_default, ts_menu_zen_mode, ts_menu_follow
+    global ts_menu_switch, ts_menu_auto_hide, ts_menu_auto_hide_pointer, ts_menu_small_default, ts_menu_zen_mode, ts_menu_follow, ts_menu_compact_toolbar
     try:
         mw.addon_view_menu
     except AttributeError:
@@ -1082,6 +1124,7 @@ def ts_setup_menu():
     ts_menu_follow = QAction("""&Follow when scrolling (faster on big cards)""", mw, checkable=True)
     ts_menu_small_default = QAction("""&Small Canvas by default""", mw, checkable=True)
     ts_menu_zen_mode = QAction("""Enable Zen Mode (hide toolbar until disabled)""", mw, checkable=True)
+    ts_menu_compact_toolbar = QAction("""Use &Compact Toolbar""", mw, checkable=True)
     
     ts_pen_color_menu = QMenu("Set &pen color", mw)
     ts_menu_pen1_color = QAction("Set Pen 1 Color", mw)
@@ -1100,6 +1143,7 @@ def ts_setup_menu():
     mw.addon_view_menu.addAction(ts_menu_follow)
     mw.addon_view_menu.addAction(ts_menu_small_default)
     mw.addon_view_menu.addAction(ts_menu_zen_mode)
+    mw.addon_view_menu.addAction(ts_menu_compact_toolbar)
     mw.addon_view_menu.addMenu(ts_pen_color_menu)
     mw.addon_view_menu.addAction(ts_menu_width)
     mw.addon_view_menu.addAction(ts_toolbar_settings)
@@ -1110,6 +1154,7 @@ def ts_setup_menu():
     ts_menu_follow.triggered.connect(ts_change_follow_settings)
     ts_menu_small_default.triggered.connect(ts_change_small_default_settings)
     ts_menu_zen_mode.triggered.connect(ts_change_zen_mode_settings)
+    ts_menu_compact_toolbar.triggered.connect(ts_change_compact_toolbar_settings)
     ts_menu_pen1_color.triggered.connect(ts_change_pen1_color)
     ts_menu_pen2_color.triggered.connect(ts_change_pen2_color)
     ts_menu_width.triggered.connect(ts_change_width)
