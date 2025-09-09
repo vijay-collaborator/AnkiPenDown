@@ -15,7 +15,11 @@
 *   **Flexible Toolbar:** Position the drawing toolbar in any corner of the screen to keep it from covering your card's content.
 
 ---
-
+## Update
+**Smart Cursors:** Your mouse cursor now changes to a mini icon of your selected tool (pen, highlighter, or eraser), so you always know what tool is active.
+**Dynamic Pen Color:** The pen cursor will now match your selected color! If you pick the red pen, your cursor turns red.
+**Critical Bug Fix:** Fixed the frustrating bug where the pen would become unresponsive after clearing the canvas.
+**Update now for a smoother and more intuitive drawing session!**
 ## My Motivation
 
 I have been a long-time user of the incredible AnkiDraw add-on but as a student, I always felt it was missing a dedicated eraser and a highlighter for my study sessions.
