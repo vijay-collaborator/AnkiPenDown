@@ -20,6 +20,7 @@
 *   **Dynamic Pen Color:** The pen cursor will now match your selected color! If you pick the red pen, your cursor turns red.
 *   **Critical Bug Fix:** Fixed the frustrating bug where the pen would become unresponsive after clearing the canvas.
 *   **Update now for a smoother and more intuitive drawing session!**
+*   **Compact Toolbar Mode Toolbar:** There is a new option in the AnkiPenDown menu called "Use Compact Toolbar". When you enable this option, the drawing toolbar on the side of the screen shrinks. The buttons become smaller and the spacing between them is reduced.
 ---
 ## My Motivation
 
