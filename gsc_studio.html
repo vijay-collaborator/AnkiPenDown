@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GSC Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Dancing+Script:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:'DM Sans',sans-serif;background:#0a0a10;color:#bbbbc8;display:flex;flex-direction:column;}
+
+.bar{height:48px;background:#0d0d14;border-bottom:1px solid #18182a;display:flex;align-items:center;padding:0 18px;gap:10px;flex-shrink:0;}
+.bar-brand{font-family:'Poppins',sans-serif;font-size:13px;font-weight:800;color:#fff;letter-spacing:1.5px;}
+.bar-dot{width:5px;height:5px;border-radius:50%;background:#ffae42;}
+.bar-sub{font-size:10px;color:#38384a;letter-spacing:.8px;}
+.bar-r{margin-left:auto;display:flex;gap:7px;}
+.ws{display:flex;height:calc(100vh - 48px);}
+
+.sb{width:330px;flex-shrink:0;overflow-y:auto;background:#0d0d14;border-right:1px solid #16162a;scrollbar-width:thin;scrollbar-color:#1e1e2e transparent;}
+.sb::-webkit-scrollbar{width:3px}.sb::-webkit-scrollbar-thumb{background:#1e1e2e;}
+
+.sg{padding:14px 14px 8px;}
+.sg+.sg{border-top:1px solid #16162a;margin-top:4px;padding-top:14px;}
+.sh{font-size:8px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#ffae42;margin-bottom:9px;display:flex;align-items:center;gap:7px;}
+.sh::after{content:'';flex:1;height:1px;background:#1e1e2e;}
+
+.L{display:block;font-size:9.5px;font-weight:600;color:#38384a;margin:9px 0 3px;letter-spacing:.5px;text-transform:uppercase;}
+input[type=text],input[type=tel],textarea,select{width:100%;background:#0a0a12;border:1px solid #1e1e2e;border-radius:5px;color:#c8c8d8;font-family:'DM Sans',sans-serif;font-size:12px;padding:7px 9px;outline:none;transition:border-color .2s;}
+input:focus,textarea:focus,select:focus{border-color:#ffae42;}
+textarea{resize:vertical;min-height:52px;line-height:1.5;}
+select option{background:#0a0a12;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+
+.csw{display:flex;align-items:center;gap:6px;background:#0a0a12;border:1px solid #1e1e2e;border-radius:5px;padding:3px 8px 3px 4px;}
+.csw input[type=color]{width:24px;height:24px;border:none;background:none;border-radius:3px;padding:0;cursor:pointer;}
+.csw span{font-size:9.5px;color:#38384a;font-weight:600;}
+
+.upb{border:1px dashed #1e1e2e;border-radius:7px;text-align:center;padding:9px 5px;cursor:pointer;position:relative;overflow:hidden;transition:border-color .2s;}
+.upb:hover{border-color:#ffae42;}.upb input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.upb img.th{width:40px;height:40px;object-fit:cover;border-radius:5px;margin:0 auto 3px;display:none;}
+.upb .ep{font-size:17px;}.upb p{font-size:9px;color:#2a2a3a;margin-top:2px;}
+
+.sr{display:flex;gap:7px;align-items:flex-start;background:#0a0a12;border:1px solid #1e1e2e;border-radius:7px;padding:8px;margin-bottom:6px;}
+.sr-ph{width:36px;height:42px;border-radius:5px;overflow:hidden;background:#14141e;flex-shrink:0;position:relative;cursor:pointer;border:1px dashed #2a2a3a;}
+.sr-ph input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.sr-ph img{width:100%;height:100%;object-fit:cover;display:none;}
+.sr-ph .ep{display:flex;align-items:center;justify-content:center;height:100%;font-size:13px;}
+.sr-f{flex:1;display:flex;flex-direction:column;gap:4px;}
+.sr-f input{font-size:11px;padding:5px 8px;}
+.db{background:none;border:none;color:#2a2a3a;cursor:pointer;font-size:12px;transition:color .15s;flex-shrink:0;}.db:hover{color:#e44d4d;}
+.ab{width:100%;font-size:11px;font-weight:600;color:#ffae42;background:none;border:1px dashed rgba(255,174,66,.25);border-radius:5px;padding:6px;cursor:pointer;margin-top:4px;letter-spacing:.3px;transition:all .2s;}
+.ab:hover{background:rgba(255,174,66,.07);}
+
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;transition:all .2s;}
+.btn-a{background:#ffae42;color:#000;}.btn-a:hover{background:#ffc05a;}
+.btn-g{background:transparent;border:1px solid #1e1e2e;color:#38384a;}.btn-g:hover{border-color:#ffae42;color:#ffae42;}
+
+.tabs{display:flex;gap:0;margin-bottom:10px;border:1px solid #1e1e2e;border-radius:7px;overflow:hidden;}
+.tab{flex:1;padding:7px 0;text-align:center;font-size:11px;font-weight:600;color:#38384a;cursor:pointer;background:#0a0a12;letter-spacing:.3px;transition:all .2s;}
+.tab.on{background:#ffae42;color:#000;}
+
+.chip-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px;}
+.chip{font-size:10px;font-weight:600;padding:3px 10px;border-radius:12px;background:#0a0a12;border:1px solid #1e1e2e;color:#555568;cursor:pointer;transition:all .15s;user-select:none;}
+.chip.on{background:#ffae42;border-color:#ffae42;color:#000;}
+
+.note{background:rgba(255,174,66,.07);border:1px solid rgba(255,174,66,.18);border-radius:6px;padding:8px 10px;font-size:10.5px;color:#8a7050;line-height:1.5;margin-top:6px;}
+.pb{height:20px;}
+
+.pv{flex:1;overflow:auto;display:flex;flex-direction:column;align-items:center;padding:20px 14px;background:#07070e;}
+.pvb{display:flex;align-items:center;gap:7px;margin-bottom:16px;background:#0d0d14;border:1px solid #16162a;border-radius:7px;padding:6px 12px;}
+.pvb span{font-size:11px;color:#28283a;min-width:36px;text-align:center;font-weight:600;}
+.pvsh{box-shadow:0 32px 80px rgba(0,0,0,.9),0 0 0 1px #16162a;display:inline-block;border-radius:2px;overflow:hidden;}
+#PW{transform-origin:top left;}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="bar-brand">GSC Studio</div>
+  <div class="bar-dot"></div>
+  <div class="bar-sub">Instagram Post Generator</div>
+  <div class="bar-r">
+    <button class="btn btn-g" onclick="doPrint()">Print / PDF</button>
+    <button class="btn btn-a" onclick="doPrint()">Export</button>
+  </div>
+</div>
+
+<div class="ws">
+<div class="sb">
+
+<div class="sg">
+<div class="sh">Post Type</div>
+<div class="tabs">
+  <div class="tab on" id="tab-batch" onclick="setTab('batch')">📢 Batch Announce</div>
+  <div class="tab" id="tab-results" onclick="setTab('results')">🏆 Results</div>
+</div>
+</div>
+
+<div class="sg">
+<div class="sh">Theme</div>
+<div class="g2">
+  <div><label class="L">Preset</label>
+    <select id="thm" onchange="applyTheme()">
+      <option value="gsc">Classic GSC</option>
+      <option value="midnight">Midnight</option>
+      <option value="crimson">Crimson</option>
+      <option value="forest">Forest</option>
+      <option value="custom">Custom</option>
+    </select>
+  </div>
+  <div><label class="L">Format</label>
+    <select id="sz" onchange="R()">
+      <option value="1080">1080 × 1080</option>
+      <option value="1350">1080 × 1350</option>
+    </select>
+  </div>
+</div>
+<div class="g2" style="margin-top:7px">
+  <div class="csw"><input type="color" id="cBlue" value="#003c8f" oninput="R()"><span>Primary</span></div>
+  <div class="csw"><input type="color" id="cRed"  value="#e44d4d" oninput="R()"><span>Accent</span></div>
+</div>
+<div class="g2" style="margin-top:6px">
+  <div class="csw"><input type="color" id="cGold" value="#ffae42" oninput="R()"><span>Gold</span></div>
+  <div class="csw"><input type="color" id="cBg"   value="#f0f4ff" oninput="R()"><span>Body BG</span></div>
+</div>
+</div>
+
+<div class="sg">
+<div class="sh">Brand</div>
+<label class="L">Institute Name</label>
+<input type="text" id="iname" value="GURTEJ SAHNI CLASSES" oninput="R()">
+<label class="L">Tagline</label>
+<input type="text" id="tag" value="Where CA Toppers Are Made" oninput="R()">
+<label class="L">Phone</label>
+<input type="tel" id="phone" value="+91 981-508-1707" oninput="R()">
+<label class="L">Website</label>
+<input type="text" id="web" value="www.gurtejsahniclasses.com" oninput="R()">
+<label class="L">Address</label>
+<input type="text" id="addr" value="SCO-378, Top Floor, Sector 32-D, Chandigarh" oninput="R()">
+<div class="g2" style="margin-top:7px">
+  <div><label class="L">Logo</label>
+    <div class="upb"><input type="file" accept="image/*" onchange="loadImg(this,'logo')">
+    <img class="th" id="logoT"><div class="ep" id="logoPh">🏛️</div><p>Logo</p></div>
+  </div>
+  <div><label class="L">Teacher Photo</label>
+    <div class="upb"><input type="file" accept="image/*" onchange="loadImg(this,'tch')">
+    <img class="th" id="tchT"><div class="ep" id="tchPh">👤</div><p>Photo</p></div>
+  </div>
+</div>
+</div>
+
+<div id="batchFields">
+<div class="sg">
+<div class="sh">Announcement</div>
+<label class="L">Label badge</label>
+<input type="text" id="bdg" value="NEW SCHEME" oninput="R()">
+<label class="L">Headline Line 1</label>
+<input type="text" id="h1" value="CA INTERMEDIATE" oninput="R()">
+<label class="L">Headline Line 2</label>
+<input type="text" id="h2" value="MAY 2026" oninput="R()">
+<label class="L">Batch Type</label>
+<input type="text" id="btype" value="Face 2 Face Batch" oninput="R()">
+<label class="L">Starting line</label>
+<input type="text" id="bstart" value="Starting 11th July 2025" oninput="R()">
+<label class="L">CTA line</label>
+<input type="text" id="cta" value="Call / WhatsApp: +91 981-508-1707" oninput="R()">
+<label class="L">Swipe hint text</label>
+<input type="text" id="swipe" value="👉 Swipe to see past results" oninput="R()">
+</div>
+
+<div class="sg">
+<div class="sh">Courses (shown near name)</div>
+<div class="chip-row" id="courseChips">
+  <span class="chip on" onclick="togChip(this)">CA Foundation</span>
+  <span class="chip on" onclick="togChip(this)">CA Intermediate</span>
+  <span class="chip on" onclick="togChip(this)">CA Final</span>
+  <span class="chip on" onclick="togChip(this)">Face2Face</span>
+  <span class="chip on" onclick="togChip(this)">Online</span>
+</div>
+</div>
+
+<div class="sg">
+<div class="sh">Subjects</div>
+<label class="L">Group 1 label</label>
+<input type="text" id="g1lbl" value="Group 1" oninput="R()">
+<label class="L">Group 1 subjects (comma sep)</label>
+<input type="text" id="g1" value="Adv. Accounting, Taxation" oninput="R()">
+<label class="L">Group 2 label</label>
+<input type="text" id="g2lbl" value="Group 2" oninput="R()">
+<label class="L">Group 2 subjects (comma sep)</label>
+<input type="text" id="g2" value="Costing, FM & SM" oninput="R()">
+</div>
+
+<div class="sg">
+<div class="sh">Feature Blocks (6 tiles, 3×2 grid)</div>
+<div class="note">Short punchy phrases — each becomes a bold coloured tile.</div>
+<div class="g2" style="margin-top:6px">
+  <div><label class="L">Tile 1</label><input type="text" id="f1" value="Small Batches" oninput="R()"></div>
+  <div><label class="L">Tile 2</label><input type="text" id="f2" value="Free Video Backup" oninput="R()"></div>
+</div>
+<div class="g2" style="margin-top:4px">
+  <div><label class="L">Tile 3</label><input type="text" id="f3" value="Handwritten Notes" oninput="R()"></div>
+  <div><label class="L">Tile 4</label><input type="text" id="f4" value="Monthly Fees" oninput="R()"></div>
+</div>
+<div class="g2" style="margin-top:4px">
+  <div><label class="L">Tile 5</label><input type="text" id="f5" value="Frequent Tests" oninput="R()"></div>
+  <div><label class="L">Tile 6</label><input type="text" id="f6" value="Timely Completion" oninput="R()"></div>
+</div>
+</div>
+</div><!-- /batchFields -->
+
+<div id="resultsFields" style="display:none">
+<div class="sg">
+<div class="sh">Results Post</div>
+<label class="L">Headline Line 1</label>
+<input type="text" id="rh1" value="OUR STUDENTS" oninput="R()">
+<label class="L">Headline Line 2</label>
+<input type="text" id="rh2" value="CLEARING CA WITH TOP MARKS" oninput="R()">
+<label class="L">Session label</label>
+<input type="text" id="rsession" value="CA INTERMEDIATE · NOV 2024" oninput="R()">
+<label class="L">Footer note</label>
+<input type="text" id="rfoot" value="See more on our Instagram & Google Maps" oninput="R()">
+</div>
+<div class="sg">
+<div class="sh">Star Result</div>
+<label class="L">Star name + achievement</label>
+<input type="text" id="starName" value="Namya · AIR 6 · All India Highest in Costing" oninput="R()">
+<label class="L">Star scores</label>
+<input type="text" id="starSc" value="FMECO — 94 Marks · COST — 100 Marks" oninput="R()">
+<div class="g2">
+  <div><label class="L">AIR Badge</label><input type="text" id="starAIR" value="AIR 6" oninput="R()"></div>
+  <div><label class="L">Star Photo</label>
+    <div class="upb"><input type="file" accept="image/*" onchange="loadImg(this,'star')">
+    <img class="th" id="starT"><div class="ep" id="starPh">⭐</div><p>Photo</p></div>
+  </div>
+</div>
+</div>
+<div class="sg">
+<div class="sh">Student Cards</div>
+<div id="stuList"></div>
+<button class="ab" onclick="addStu()">+ Add Student</button>
+</div>
+</div>
+
+<div class="pb"></div>
+</div><!-- /sb -->
+
+<div class="pv">
+  <div class="pvb">
+    <button class="btn btn-g" style="padding:3px 8px;font-size:11px" onclick="dz(-1)">−</button>
+    <span id="zlbl">52%</span>
+    <button class="btn btn-g" style="padding:3px 8px;font-size:11px" onclick="dz(1)">+</button>
+    <span style="color:#18182a;margin:0 2px">|</span>
+    <button class="btn btn-g" style="padding:3px 8px;font-size:11px" onclick="zoom=.52;applyZ()">Fit</button>
+  </div>
+  <div class="pvsh">
+    <div id="PW"><div id="POST"></div></div>
+  </div>
+</div>
+</div>
+
+<script>
+let zoom=.52, postType='batch';
+let imgs={logo:null,tch:null,star:null};
+let students=[], stuImgs={};
+
+function setTab(t){
+  postType=t;
+  document.getElementById('tab-batch').className='tab'+(t==='batch'?' on':'');
+  document.getElementById('tab-results').className='tab'+(t==='results'?' on':'');
+  document.getElementById('batchFields').style.display=t==='batch'?'':'none';
+  document.getElementById('resultsFields').style.display=t==='results'?'':'none';
+  R();
+}
+
+const THEMES={
+  gsc:     {cBlue:'#003c8f',cRed:'#e44d4d',cGold:'#ffae42',cBg:'#f0f4ff'},
+  midnight:{cBlue:'#1a0a4a',cRed:'#7c3aed',cGold:'#22d3ee',cBg:'#0d0d18'},
+  crimson: {cBlue:'#1a0010',cRed:'#be123c',cGold:'#fbbf24',cBg:'#fff5f7'},
+  forest:  {cBlue:'#052e16',cRed:'#16a34a',cGold:'#fbbf24',cBg:'#f0fdf4'},
+};
+function applyTheme(){const p=THEMES[V('thm')];if(p)for(const[k,v]of Object.entries(p))document.getElementById(k).value=v;R();}
+
+function dz(d){zoom=Math.min(1.6,Math.max(.14,zoom+d*.05));applyZ();}
+function applyZ(){
+  const H=+V('sz')===1350?1350:1080;
+  const w=document.getElementById('PW');
+  w.style.transform=`scale(${zoom})`;w.style.transformOrigin='top left';
+  w.style.width='1080px';w.style.height=H+'px';
+  w.parentElement.style.width=Math.round(1080*zoom)+'px';
+  w.parentElement.style.height=Math.round(H*zoom)+'px';
+  document.getElementById('zlbl').textContent=Math.round(zoom*100)+'%';
+}
+
+function loadImg(inp,key){
+  const f=inp.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=e=>{imgs[key]=e.target.result;const th=document.getElementById(key+'T');if(th){th.src=e.target.result;th.style.display='block';}const ph=document.getElementById(key+'Ph');if(ph)ph.style.display='none';R();};
+  rd.readAsDataURL(f);
+}
+
+function togChip(el){el.classList.toggle('on');R();}
+function getChips(){return[...document.querySelectorAll('#courseChips .chip.on')].map(e=>e.textContent.trim());}
+
+function addStu(){const i=students.length;students.push({name:'',scores:''});stuImgs[i]=null;redrawStu();R();}
+function removeStu(i){students.splice(i,1);const n={};Object.keys(stuImgs).forEach(k=>{const x=+k;if(x<i)n[x]=stuImgs[k];else if(x>i)n[x-1]=stuImgs[k];});stuImgs=n;redrawStu();R();}
+function redrawStu(){
+  document.getElementById('stuList').innerHTML=students.map((s,i)=>`
+    <div class="sr">
+      <div class="sr-ph"><input type="file" accept="image/*" onchange="loadStuImg(this,${i})">
+        <img id="si${i}" ${stuImgs[i]?`src="${stuImgs[i]}"`:''}  style="width:100%;height:100%;object-fit:cover;display:${stuImgs[i]?'block':'none'};">
+        <div class="ep" id="sp${i}" style="display:${stuImgs[i]?'none':'flex'}">😊</div>
+      </div>
+      <div class="sr-f">
+        <input placeholder="Student name" value="${s.name}" oninput="students[${i}].name=this.value;R()">
+        <input placeholder="Scores e.g. COST 86 · ACCTS 72" value="${s.scores}" oninput="students[${i}].scores=this.value;R()">
+      </div>
+      <button class="db" onclick="removeStu(${i})">✕</button>
+    </div>`).join('');
+}
+function loadStuImg(inp,idx){
+  const f=inp.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=e=>{stuImgs[idx]=e.target.result;const im=document.getElementById('si'+idx);if(im){im.src=e.target.result;im.style.display='block';}const ph=document.getElementById('sp'+idx);if(ph)ph.style.display='none';R();};
+  rd.readAsDataURL(f);
+}
+
+function V(id){return document.getElementById(id).value;}
+function ha(hex,a){const h=hex.replace('#','');return `rgba(${parseInt(h.slice(0,2),16)},${parseInt(h.slice(2,4),16)},${parseInt(h.slice(4,6),16)},${a})`;}
+
+function sprinkles(W,H,c1,c2,c3){
+  const pts=[[40,38,'c',13,c3,.5],[175,20,'r',34,10,c1,.2,20],[355,48,'c',8,c2,.4],[575,16,'r',26,9,c3,.3,-14],[755,40,'c',10,c1,.22],[935,22,'r',20,8,c2,.32,28],[1058,46,'c',8,c3,.42],[95,H-36,'r',28,9,c3,.28,22],[315,H-20,'c',9,c2,.38],[555,H-44,'r',22,8,c1,.22,-18],[775,H-28,'c',11,c3,.36],[995,H-40,'r',18,7,c2,.3,18]];
+  let s=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;pointer-events:none;z-index:1;" preserveAspectRatio="none">`;
+  pts.forEach(pt=>{if(pt[2]==='c')s+=`<circle cx="${pt[0]*W/1080}" cy="${pt[1]*H/1080}" r="${pt[3]*W/1080}" fill="${pt[4]}" opacity="${pt[5]}"/>`;else{const[x,y,,w,h,col,op,rot]=pt;const cx=x*W/1080,cy=y*H/1080,rw=w*W/1080,rh=h*W/1080;s+=`<rect x="${cx-rw/2}" y="${cy-rh/2}" width="${rw}" height="${rh}" rx="${rh/2}" fill="${col}" opacity="${op}" transform="rotate(${rot},${cx},${cy})"/>`;}});
+  return s+'</svg>';
+}
+
+// ═══════════════ BATCH POST ═══════════════
+function renderBatch(){
+  const W=1080, sz=+V('sz'), H=sz===1350?1350:1080;
+  const p=n=>Math.round(n*(W/1080));
+  const is1350=sz===1350;
+
+  const blue=V('cBlue'), red=V('cRed'), gold=V('cGold'), bg=V('cBg');
+  const bgLum=parseInt(bg.replace('#','').slice(0,2),16);
+  const dark=bgLum<100;
+  const bt=dark?'#f0f0f8':'#0a0a16';
+  const btMid=dark?'rgba(240,240,248,.6)':'rgba(10,10,22,.5)';
+
+  const iname=V('iname'), tag=V('tag'), phone=V('phone'), web=V('web'), addr=V('addr');
+  const h1=V('h1'), h2=V('h2'), bdg=V('bdg'), btype=V('btype'), bstart=V('bstart');
+  const cta=V('cta'), swipe=V('swipe');
+  const g1lbl=V('g1lbl'), g1=V('g1').split(',').map(s=>s.trim()).filter(Boolean);
+  const g2lbl=V('g2lbl'), g2=V('g2').split(',').map(s=>s.trim()).filter(Boolean);
+  const feats=[V('f1'),V('f2'),V('f3'),V('f4'),V('f5'),V('f6')].filter(Boolean);
+  const chips=getChips();
+
+  // teacher photo — anchored bottom-right, height = full post minus bottom bar (~p(90))
+  const tchW=p(is1350?310:280);
+  const bottomBarH = p(90);
+  const tchH = H - bottomBarH;
+  const tchEl=imgs.tch?`
+    <div style="position:absolute;right:0;bottom:${bottomBarH}px;width:${tchW}px;height:${tchH}px;z-index:4;overflow:hidden;pointer-events:none;">
+      <img src="${imgs.tch}" style="width:100%;height:100%;object-fit:cover;object-position:top center;">
+      <div style="position:absolute;inset:0;background:linear-gradient(to right,${bg} 0%,transparent 35%);"></div>
+      <div style="position:absolute;bottom:0;left:0;right:0;height:${p(80)}px;background:linear-gradient(to top,${bg},transparent);"></div>
+    </div>`:'';
+
+  // content right-padding shrinks when teacher present
+  const cPad = imgs.tch ? `padding-right:${p(tchW+8)}px;` : '';
+
+  // logo
+  const lsz=p(80);
+  const logoInner=imgs.logo
+    ?`<img src="${imgs.logo}" style="width:${lsz}px;height:${lsz}px;object-fit:contain;border-radius:${p(12)}px;flex-shrink:0;">`
+    :`<div style="width:${lsz}px;height:${lsz}px;background:rgba(255,255,255,.15);border-radius:${p(12)}px;display:flex;align-items:center;justify-content:center;font-size:${p(34)}px;flex-shrink:0;">📚</div>`;
+  const logoEl=`<div style="background:rgba(255,255,255,.2);backdrop-filter:blur(10px);border-radius:${p(18)}px;padding:${p(10)}px;box-shadow:0 ${p(12)}px ${p(30)}px rgba(0,0,0,.3);position:relative;z-index:3;">${logoInner}</div>`;
+
+  // feature tiles — alternating blue / red / gold-tint
+  const featIcons=['👥','🎬','✍️','💳','📝','⏱️'];
+  const tileColors=[blue, red, ha(gold,.18), red, blue, ha(gold,.18)];
+  const tileFg=['#fff','#fff',gold,'#fff','#fff',gold];
+  const featTiles=feats.slice(0,6).map((f,i)=>`
+    <div style="background:${tileColors[i]};border-radius:${p(16)}px;padding:${p(is1350?20:17)}px ${p(16)}px ${p(is1350?18:15)}px;display:flex;flex-direction:column;gap:${p(8)}px;${i%3===2?`border:${p(2)}px solid ${ha(gold,.4)};`:''}">
+      <div style="font-size:${p(is1350?30:26)}px;line-height:1;">${featIcons[i]}</div>
+      <div style="font-family:'Poppins',sans-serif;font-size:${p(is1350?19:17)}px;font-weight:800;color:${tileFg[i]};line-height:1.25;">${f}</div>
+    </div>`).join('');
+
+  // subject blocks
+  function subjBlock(lbl,items,acc){
+    if(!items.length) return '';
+    return `<div style="background:${ha(acc,dark?.12:.07)};border-radius:${p(16)}px;padding:${p(16)}px ${p(18)}px;border-left:${p(5)}px solid ${acc};flex:1;">
+      <div style="font-family:'Poppins',sans-serif;font-size:${p(17)}px;font-weight:800;color:${acc};letter-spacing:.5px;text-transform:uppercase;margin-bottom:${p(10)}px;">${lbl}</div>
+      ${items.map(s=>`<div style="display:flex;align-items:center;gap:${p(10)}px;margin-bottom:${p(8)}px;">
+        <div style="width:${p(8)}px;height:${p(8)}px;border-radius:50%;background:${acc};flex-shrink:0;"></div>
+        <div style="font-family:'Poppins',sans-serif;font-size:${p(20)}px;font-weight:700;color:${bt};">${s}</div>
+      </div>`).join('')}
+    </div>`;
+  }
+
+  const html=`
+<div style="width:${W}px;height:${H}px;background:${bg};overflow:hidden;font-family:'Poppins',sans-serif;position:relative;display:flex;flex-direction:column;">
+
+  <!-- BG ORBS -->
+  <div style="position:absolute;top:-${p(140)}px;left:-${p(110)}px;width:${p(520)}px;height:${p(520)}px;border-radius:50%;background:${ha(blue,.07)};pointer-events:none;z-index:0;"></div>
+  <div style="position:absolute;bottom:-${p(90)}px;right:${p(imgs.tch?tchW:40)}px;width:${p(380)}px;height:${p(380)}px;border-radius:50%;background:${ha(gold,.09)};pointer-events:none;z-index:0;"></div>
+  ${sprinkles(W,H,blue,red,gold)}
+  ${tchEl}
+
+  <!-- ██ ZONE 1 — BRAND HEADER ██ -->
+  <div style="background:linear-gradient(135deg,${blue},#002a63);padding:${p(20)}px ${p(26)}px;z-index:5;position:relative;overflow:hidden;${cPad}">
+    <div style="position:absolute;top:0;right:-${p(120)}px;width:${p(420)}px;height:${p(220)}px;background:${red};transform:rotate(-12deg);z-index:0;opacity:.9;"></div>
+    <div style="position:absolute;bottom:0;left:0;width:100%;height:${p(6)}px;background:linear-gradient(90deg,#ffae42,#ffd36b,#ffae42);z-index:2;"></div>
+    <div style="display:flex;align-items:flex-start;gap:${p(16)}px;position:relative;z-index:3;">
+      ${logoEl}
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:${p(44)}px;font-weight:900;color:#fff;line-height:1.0;letter-spacing:-1px;">${iname}</div>
+        <div style="font-family:'Dancing Script',cursive;font-size:${p(24)}px;color:${gold};margin-top:${p(4)}px;">${tag}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:${p(6)}px;margin-top:${p(10)}px;">
+          ${chips.map(c=>`<span style="background:rgba(255,255,255,.18);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.35);box-shadow:0 ${p(6)}px ${p(14)}px rgba(0,0,0,.15);border-radius:${p(20)}px;padding:${p(4)}px ${p(14)}px;font-size:${p(15)}px;font-weight:700;color:#fff;letter-spacing:.2px;">${c}</span>`).join('')}
+        </div>
+        <div style="font-size:${p(15)}px;color:rgba(255,255,255,.7);font-weight:600;margin-top:${p(8)}px;letter-spacing:.3px;">${web}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ██ ZONE 2 — ANNOUNCEMENT HERO ██ -->
+  <div style="padding:${p(18)}px ${p(26)}px ${p(10)}px;z-index:5;position:relative;${cPad}">
+    ${bdg?`<div style="display:inline-block;margin-bottom:${p(12)}px;background:${red};border-radius:${p(28)}px;padding:${p(7)}px ${p(22)}px;">
+      <span style="font-size:${p(19)}px;font-weight:800;color:#fff;letter-spacing:${p(2.5)}px;text-transform:uppercase;">${bdg}</span>
+    </div>`:''}
+
+    <div style="font-size:${p(is1350?88:82)}px;font-weight:900;color:${bt};line-height:.88;letter-spacing:-${p(2)}px;">${h1}</div>
+    <div style="font-size:${p(is1350?82:76)}px;font-weight:900;color:${gold};line-height:.92;letter-spacing:-${p(1.5)}px;margin-top:${p(2)}px;">${h2}</div>
+
+    <div style="display:flex;align-items:center;flex-wrap:wrap;gap:${p(10)}px;margin-top:${p(16)}px;">
+      <div style="background:${blue};border-radius:${p(10)}px;padding:${p(9)}px ${p(22)}px;">
+        <span style="font-size:${p(22)}px;font-weight:800;color:#fff;">${btype}</span>
+      </div>
+      <span style="font-size:${p(20)}px;font-weight:600;color:${btMid};">${bstart}</span>
+    </div>
+  </div>
+
+  <!-- ██ ZONE 3 — FEATURE TILES 3×2 ██ -->
+  <div style="padding:${p(10)}px ${p(26)}px;z-index:5;position:relative;${cPad}">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:${p(10)}px;">
+      ${featTiles}
+    </div>
+  </div>
+
+  <!-- ██ ZONE 4 — SUBJECTS ██ -->
+  <div style="padding:${p(10)}px ${p(26)}px;z-index:5;position:relative;${cPad}">
+    <div style="display:flex;gap:${p(12)}px;">
+      ${subjBlock(g1lbl,g1,blue)}
+      ${subjBlock(g2lbl,g2,red)}
+    </div>
+  </div>
+
+  <!-- FLEX SPACER -->
+  <div style="flex:1;min-height:${p(8)}px;z-index:5;position:relative;"></div>
+
+  <!-- ██ ZONE 5 — SWIPE HINT ██ -->
+  <div style="padding:${p(8)}px ${p(26)}px;z-index:5;position:relative;${cPad}">
+    <div style="display:inline-flex;align-items:center;gap:${p(10)}px;background:${ha(gold,.14)};border:${p(2)}px solid ${ha(gold,.4)};border-radius:${p(30)}px;padding:${p(9)}px ${p(22)}px;">
+      <span style="font-size:${p(26)}px;font-weight:800;color:${dark?gold:blue};">${swipe}</span>
+    </div>
+  </div>
+
+  <!-- ██ ZONE 6 — BOTTOM CTA BAR ██ -->
+  <div style="background:${red};padding:${p(16)}px ${p(26)}px;z-index:5;position:relative;${cPad}display:flex;align-items:center;justify-content:space-between;gap:${p(14)}px;">
+    <div>
+      <div style="font-size:${p(24)}px;font-weight:900;color:#fff;letter-spacing:.2px;">${cta}</div>
+      <div style="font-size:${p(20)}px;font-weight:600;color:rgba(255,255,255,.85);margin-top:${p(4)}px;">${addr}</div>
+    </div>
+    <div style="text-align:right;flex-shrink:0;">
+      <div style="font-size:${p(18)}px;font-weight:700;color:rgba(255,255,255,.85);">${web}</div>
+    </div>
+  </div>
+
+</div>`;
+
+  document.getElementById('POST').innerHTML=html;
+  applyZ();
+}
+
+// ═══════════════ RESULTS POST ═══════════════
+function renderResults(){
+  const W=1080, sz=+V('sz'), H=sz===1350?1350:1080;
+  const p=n=>Math.round(n*(W/1080));
+  const blue=V('cBlue'), red=V('cRed'), gold=V('cGold'), bg=V('cBg');
+  const bgLum=parseInt(bg.replace('#','').slice(0,2),16);
+  const dark=bgLum<100;
+  const bt=dark?'#f0f0f8':'#0a0a16';
+
+  const iname=V('iname'), tag=V('tag'), phone=V('phone'), web=V('web');
+  const rh1=V('rh1'), rh2=V('rh2'), rsession=V('rsession'), rfoot=V('rfoot');
+  const starName=V('starName'), starSc=V('starSc'), starAIR=V('starAIR');
+
+  const lsz=p(62);
+  const logoInner=imgs.logo
+    ?`<img src="${imgs.logo}" style="width:${lsz}px;height:${lsz}px;object-fit:contain;border-radius:${p(10)}px;">`
+    :`<div style="width:${lsz}px;height:${lsz}px;background:rgba(255,255,255,.15);border-radius:${p(10)}px;display:flex;align-items:center;justify-content:center;font-size:${p(26)}px;">📚</div>`;
+  const logoEl=`<div style="background:rgba(255,255,255,.2);backdrop-filter:blur(10px);border-radius:${p(18)}px;padding:${p(8)}px;box-shadow:0 ${p(10)}px ${p(24)}px rgba(0,0,0,.28);">${logoInner}</div>`;
+
+  const spSz=p(104);
+  const starPh=imgs.star
+    ?`<img src="${imgs.star}" style="width:${spSz}px;height:${spSz}px;object-fit:cover;border-radius:${p(12)}px;border:${p(3)}px solid ${gold};flex-shrink:0;">`
+    :`<div style="width:${spSz}px;height:${spSz}px;background:${ha(gold,.1)};border-radius:${p(12)}px;border:${p(3)}px solid ${ha(gold,.3)};display:flex;align-items:center;justify-content:center;font-size:${p(36)}px;flex-shrink:0;">⭐</div>`;
+
+  const cols=students.length<=4?2:3;
+  const stuCards=students.map((s,i)=>{
+    const phSz=p(76);
+    const photoEl=stuImgs[i]
+      ?`<img src="${stuImgs[i]}" style="width:${phSz}px;height:${phSz}px;object-fit:cover;border-radius:50%;border:${p(3)}px solid ${gold};flex-shrink:0;">`
+      :`<div style="width:${phSz}px;height:${phSz}px;background:${ha(gold,.1)};border-radius:50%;border:${p(2)}px solid ${ha(gold,.3)};display:flex;align-items:center;justify-content:center;font-size:${p(28)}px;flex-shrink:0;">😊</div>`;
+    return`<div style="background:${ha('#fff',dark?.06:.08)};border-radius:${p(16)}px;padding:${p(16)}px ${p(18)}px;border:1px solid ${ha(gold,.18)};display:flex;align-items:center;gap:${p(14)}px;">
+      ${photoEl}
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:${p(22)}px;font-weight:800;color:${bt};line-height:1.2;margin-bottom:${p(4)}px;">${s.name||'Name'}</div>
+        <div style="font-size:${p(18)}px;font-weight:600;color:${gold};line-height:1.3;">${s.scores||'Scores'}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const html=`
+<div style="width:${W}px;height:${H}px;background:${bg};overflow:hidden;font-family:'Poppins',sans-serif;position:relative;display:flex;flex-direction:column;">
+  <div style="position:absolute;top:-${p(100)}px;right:-${p(80)}px;width:${p(420)}px;height:${p(420)}px;border-radius:50%;background:${ha(gold,.07)};pointer-events:none;z-index:0;"></div>
+  <div style="position:absolute;bottom:-${p(80)}px;left:-${p(60)}px;width:${p(320)}px;height:${p(320)}px;border-radius:50%;background:${ha(blue,.07)};pointer-events:none;z-index:0;"></div>
+  ${sprinkles(W,H,blue,red,gold)}
+
+  <div style="background:linear-gradient(135deg,${blue},#002a63);padding:${p(18)}px ${p(26)}px;z-index:5;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:${p(14)}px;">
+    <div style="position:absolute;top:0;right:-${p(120)}px;width:${p(420)}px;height:${p(220)}px;background:${red};transform:rotate(-12deg);z-index:0;opacity:.9;"></div>
+    <div style="position:absolute;bottom:0;left:0;width:100%;height:${p(6)}px;background:linear-gradient(90deg,#ffae42,#ffd36b,#ffae42);z-index:2;"></div>
+    <div style="display:flex;align-items:center;gap:${p(14)}px;position:relative;z-index:3;">
+      ${logoEl}
+      <div>
+        <div style="font-size:${p(34)}px;font-weight:900;color:#fff;line-height:1.1;letter-spacing:-1px;">${iname}</div>
+        <div style="font-family:'Dancing Script',cursive;font-size:${p(21)}px;color:${gold};">${tag}</div>
+        <div style="font-size:${p(14)}px;color:rgba(255,255,255,.7);font-weight:600;letter-spacing:.3px;margin-top:${p(3)}px;">${web}</div>
+      </div>
+    </div>
+    <div style="background:rgba(255,255,255,.18);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.35);box-shadow:0 ${p(6)}px ${p(14)}px rgba(0,0,0,.15);border-radius:${p(10)}px;padding:${p(8)}px ${p(18)}px;flex-shrink:0;position:relative;z-index:3;">
+      <div style="font-size:${p(16)}px;font-weight:800;color:#fff;letter-spacing:${p(.8)}px;text-align:center;">${rsession}</div>
+    </div>
+  </div>
+
+  <div style="flex:1;display:flex;flex-direction:column;padding:${p(22)}px ${p(26)}px;position:relative;z-index:5;gap:${p(14)}px;overflow:hidden;">
+    <div>
+      <div style="font-size:${p(54)}px;font-weight:900;color:${bt};line-height:.92;letter-spacing:-${p(1)}px;">${rh1}</div>
+      <div style="font-size:${p(40)}px;font-weight:800;color:${red};line-height:1;margin-top:${p(2)}px;">${rh2}</div>
+    </div>
+    <div style="background:linear-gradient(135deg,${blue},${ha(blue,.75)});border-radius:${p(20)}px;padding:${p(18)}px ${p(22)}px;display:flex;align-items:center;gap:${p(18)}px;box-shadow:0 ${p(8)}px ${p(28)}px ${ha(blue,.28)};flex-shrink:0;">
+      ${starPh}
+      <div style="flex:1;">
+        <div style="display:inline-block;background:${gold};border-radius:${p(24)}px;padding:${p(5)}px ${p(18)}px;margin-bottom:${p(8)}px;">
+          <span style="font-size:${p(21)}px;font-weight:900;color:#000;">${starAIR}</span>
+        </div>
+        <div style="font-size:${p(23)}px;font-weight:700;color:#fff;line-height:1.3;">${starName}</div>
+        <div style="font-family:'Dancing Script',cursive;font-size:${p(21)}px;color:${gold};margin-top:${p(4)}px;">${starSc}</div>
+      </div>
+    </div>
+    ${students.length>0?`<div style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:${p(12)}px;flex:1;overflow:hidden;">${stuCards}</div>`
+    :`<div style="flex:1;display:flex;align-items:center;justify-content:center;opacity:.3;"><div style="font-size:${p(22)}px;font-weight:700;color:${bt};text-align:center;">Add student results →</div></div>`}
+  </div>
+
+  <div style="background:${red};padding:${p(14)}px ${p(26)}px;z-index:5;position:relative;display:flex;align-items:center;justify-content:space-between;gap:${p(12)}px;">
+    <div style="font-size:${p(21)}px;font-weight:900;color:#fff;">${phone} · ${web}</div>
+    <div style="font-family:'Dancing Script',cursive;font-size:${p(18)}px;color:rgba(255,255,255,.85);">${rfoot}</div>
+  </div>
+</div>`;
+
+  document.getElementById('POST').innerHTML=html;
+  applyZ();
+}
+
+function R(){postType==='batch'?renderBatch():renderResults();}
+
+function doPrint(){
+  const sz=+V('sz'),H=sz===1350?1350:1080;
+  const inner=document.getElementById('POST').innerHTML;
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Dancing+Script:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>*{margin:0;padding:0;box-sizing:border-box}@page{size:1080px ${H}px;margin:0}html,body{width:1080px;height:${H}px;overflow:hidden;}</style>
+</head><body>${inner}<script>window.onload=()=>setTimeout(()=>window.print(),1000)<\/script></body></html>`);
+  win.document.close();
+}
+
+window.onload=()=>{
+  students=[{name:'Raghav Goyal',scores:'COST 86 · ADV ACCTS 72'},{name:'Twinkle',scores:'COST 83'},{name:'Anuj Sharma',scores:'COST 83 · FM-SM 62'},{name:'Samarth Goyal',scores:'COST 81'}];
+  stuImgs={};redrawStu();R();
+};
+</script>
+</body>
+</html>
